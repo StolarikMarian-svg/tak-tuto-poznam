@@ -1,13 +1,11 @@
 """
-🎶 Tak túto poznám! – Spotify web verzia 🇸🇰🇨🇿
-Verzia: v14_web (2025-11-09)
+🎶 Tak túto poznám! – Spotify hra 🇸🇰🇨🇿
+Verzia: v14 (Render-ready)
 
 🧾 CHANGELOG:
-- 🌍 Prevedené z Tkinter do Flask
-- ✅ Bez live/remaster verzií
-- ✅ Zachovaná logika výberu interpretov a neopakovaní
-- 🎧 Prehrávanie cez Spotify Web API
-- 🧠 Zachovaný moderný dizajn v HTML/CSS
+- ✅ Pripravené na nasadenie na Render (Flask web app)
+- 🔁 Kontrola interpretov, odstránené live/remaster verzie
+- 🎨 Moderný dizajn (tmavé pozadie, CZ/SK farby)
 """
 
 from flask import Flask, render_template_string, redirect
@@ -17,7 +15,7 @@ import pathlib
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-# --- Cache umiestnenie ---
+# --- Cache umiestnenie (v bezpečnom priečinku používateľa) ---
 CACHE_PATH = pathlib.Path.home() / "AppData" / "Local" / "SpotifyGameCache"
 os.makedirs(CACHE_PATH, exist_ok=True)
 
@@ -71,7 +69,6 @@ def random_cz_sk_song():
                 real_artist = song["artists"][0]["name"].lower().strip()
                 title = song["name"].lower()
                 album = song["album"]["name"].lower()
-                # filtrovanie presných zhôd a vylúčenie live/remaster
                 if real_artist != artist.lower().strip():
                     continue
                 if any(x in title for x in ["live", "živě", "naživo"]):
@@ -99,7 +96,6 @@ def index():
     if not uri:
         return "<h2>🎉 Všetky dostupné pesničky už boli prehrané!</h2>"
 
-    # Spustenie prehrávania (len ak máš Spotify aktívne zariadenie)
     try:
         devices = sp.devices()
         if devices["devices"]:
@@ -156,7 +152,7 @@ def index():
 def next_song():
     return redirect("/")
 
-# --- Spustenie ---
+# --- Render / Lokálny server ---
 if __name__ == "__main__":
-    print("🌍 Otvor v prehliadači: http://127.0.0.1:5000")
-    app.run(debug=False)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
