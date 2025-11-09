@@ -1,11 +1,11 @@
 """
 🎶 Tak túto poznám! – Spotify hra 🇸🇰🇨🇿
-Verzia: v14 (Render-ready)
+Verzia: v14 (Render-ready, stable)
 
 🧾 CHANGELOG:
-- ✅ Pripravené na nasadenie na Render (Flask web app)
-- 🔁 Kontrola interpretov, odstránené live/remaster verzie
-- 🎨 Moderný dizajn (tmavé pozadie, CZ/SK farby)
+- ✅ 100 % kompatibilné s Render
+- 🚫 Filtruje live/remaster/deluxe verzie
+- 🎨 Moderný webový dizajn (tmavé pozadie)
 """
 
 from flask import Flask, render_template_string, redirect
@@ -16,13 +16,13 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 # --- Cache umiestnenie (v bezpečnom priečinku používateľa) ---
-CACHE_PATH = pathlib.Path.home() / "AppData" / "Local" / "SpotifyGameCache"
+CACHE_PATH = pathlib.Path.home() / ".spotify_cache"
 os.makedirs(CACHE_PATH, exist_ok=True)
 
 # --- Spotify údaje ---
 CLIENT_ID = "cfeb950f904249629dfd0346d7e6b3e3"
 CLIENT_SECRET = "95d3996bc94a4498898118bcc51749b1"
-REDIRECT_URI = "http://127.0.0.1:8888/callback"
+REDIRECT_URI = "https://tak-tuto-poznam.onrender.com/callback"  # Render-friendly callback
 SCOPE = "user-read-playback-state,user-modify-playback-state,streaming"
 
 # --- Spotify inicializácia ---
@@ -44,10 +44,9 @@ ARTISTS = [
     "Marta Kubišová", "Marika Gombitová", "Karol Duchoň",
     "Pavol Hammel", "Dežo Ursiny", "Jana Kirschner", "Lucie Bílá",
     "Daniel Landa", "Ben Cristovao", "Kali", "Kristína",
-    "Norbi Lukáš", "Peter Lipa", "Hex", "Polemic", "Adam Ďurica",
+    "Peter Lipa", "Hex", "Polemic", "Adam Ďurica",
     "Horkýže Slíže", "Slza", "Sebastian", "Valdemar Matuška",
-    "Nedvědovci", "Buty", "Michal Tučný", "MC Erik & Barbara",
-    "Majk Spirit", "Hudba z Marsu", "Wanastowi Vjecy"
+    "Nedvědovci", "Buty", "Michal Tučný", "Majk Spirit", "Hudba z Marsu"
 ]
 
 played_songs = set()
@@ -71,7 +70,7 @@ def random_cz_sk_song():
                 album = song["album"]["name"].lower()
                 if real_artist != artist.lower().strip():
                     continue
-                if any(x in title for x in ["live", "živě", "naživo"]):
+                if any(x in title for x in ["live", "živě", "naživo", "remix"]):
                     continue
                 if any(x in album for x in ["live", "živě", "naživo", "remaster", "deluxe", "výběr", "best of"]):
                     continue
@@ -96,14 +95,6 @@ def index():
     if not uri:
         return "<h2>🎉 Všetky dostupné pesničky už boli prehrané!</h2>"
 
-    try:
-        devices = sp.devices()
-        if devices["devices"]:
-            device_id = devices["devices"][0]["id"]
-            sp.start_playback(device_id=device_id, uris=[uri])
-    except Exception:
-        pass
-
     html = f"""
     <html>
     <head>
@@ -126,6 +117,7 @@ def index():
                 border-radius: 8px;
                 margin: 10px;
                 cursor: pointer;
+                text-decoration: none;
             }}
             .button:hover {{
                 background-color: #00cca3;
