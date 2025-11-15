@@ -11,10 +11,10 @@ os.makedirs(CACHE_PATH, exist_ok=True)
 
 # --- Environment variables ---
 CLIENT_ID = os.environ.get("SPOTIFY_CLIENT_ID")
-CLIENT_SECRET = os.environ.get("SPOTIFY_CLIENT_SECRET")
+CLIENT_SECRET = os.environ.get("CLIENT_SECRET")  # berie tvoju env premennú
 
 if not CLIENT_ID or not CLIENT_SECRET:
-    raise RuntimeError("Chýba SPOTIFY_CLIENT_ID alebo SPOTIFY_CLIENT_SECRET v Environment Variables Renderu")
+    raise RuntimeError("Chýba SPOTIFY_CLIENT_ID alebo CLIENT_SECRET v Environment Variables Renderu")
 
 # --- Spotify client credentials ---
 auth_manager = SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
@@ -120,3 +120,4 @@ def index():
         year=year,
         uri_id=uri_id
     )
+
