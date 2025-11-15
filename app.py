@@ -62,3 +62,61 @@ HTML_TEMPLATE = """
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #fff;
       display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 24px;
+      padding: 32px 28px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9);
+      text-align: center;
+    }
+    h1 { font-size: 1.7rem; margin-bottom: 0.5rem; }
+    .subtitle { opacity: 0.8; font-size: 0.95rem; margin-bottom: 2rem; }
+    .song { font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .meta { opacity: 0.8; margin-bottom: 1.5rem; }
+    .btn {
+      display: inline-block;
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #1db954;
+      color: #000;
+      text-decoration: none;
+    }
+    .btn:hover { opacity: 0.92; transform: translateY(-1px); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎶 Tak túto poznám!</h1>
+    <div class="subtitle">Uhádni pesničku – CZ/SK edícia</div>
+
+    <div class="song">{{ title }} – {{ artist }}</div>
+    <div class="meta">({{ year }})</div>
+
+    <a class="btn" href="https://open.spotify.com/track/{{ uri_id }}" target="_blank">▶️ Pustiť na Spotify</a>
+
+    <p style="margin-top: 1.5rem; font-size: .8rem; opacity: .7;">
+      Refreshni stránku pre ďalšiu pesničku.
+    </p>
+  </div>
+</body>
+</html>
+"""
+
+@app.route("/", methods=["GET"])
+def index():
+    title, artist, year, uri_id = random_cz_sk_song()
+    return render_template_string(
+        HTML_TEMPLATE,
+        title=title,
+        artist=artist,
+        year=year,
+        uri_id=uri_id
+    )
